@@ -10,7 +10,7 @@ If the content exceeds one page capacity, split it logically into multiple pages
 <div class="page" style="
   width: 794px;
   height: 1123px;
-  padding: 40px;
+  padding: 96px 120px;
   box-sizing: border-box;
 ">
 </instructions>
@@ -64,16 +64,15 @@ Use the following guidelines to ensure compatibility and optimal formatting.
 - **\`td\`**: Data cell.
     - Attributes: \`rowspan\` (supported but complex; use simple structures if possible), \`colspan\`.
     - **CRITICAL**: **DO NOT USE NESTED TABLES**. They are ignored by the converter and will disappear. Use flat tables with col/rowspan.
-    - **CRITICAL**: **USE PIXEL WIDTH ATTRIBUTES** (e.g., \`<td width="200px">\`). **Percentages can fail**.
     - **FORBIDDEN**: **Do NOT use CSS width (e.g. \`style="width: 200px"\`)**. It is often ignored on cells.
     - **Layout Tables**: For invisible layout, simply use \`style="border: none;"\`. Avoid the \`border\` attribute.
     - **CRITICAL Pattern**: Use the "**Spacer Cell**" pattern for side-by-side content. **NEVER nest tables.**
         - **Incorrect (Nested)**: \`<table><tr><td><table>...</table></td></tr></table>\`
-        - **Correct (Spacer)**: \`<table><tr><td width="347px" style="border: 1px solid black;">Content A</td><td width="20px" style="border: none;"></td><td width="347px" style="border: 1px solid black;">Content B</td></tr></table>\`
-**Images:**
+        - **Correct (Spacer)**: \`<table><tr><td width="48.5%" style="border: 1px solid black;">Content A</td><td width="3%" style="border: none;"></td><td width="48.5%" style="border: 1px solid black;">Content B</td></tr></table>\`
+** Images:**
 - **\`<img>\`**: Images.
     - Attributes: \`src\` (URL or base64), \`alt\`, \`width\` and \`height\`.
-    - **Dimensions**: Maximum content width is **714px**.
+    - **Dimensions**: Maximum content width is **554px**.
     - **Formats**: JPG, PNG, GIF recommended. SVG support depends on specific library configuration (embedded vs converted).
 ### Supported CSS Styles
 **Strictly use inline styles** (\`style="..."\`).

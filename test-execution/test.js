@@ -1,33 +1,18 @@
 const fs = require('fs');
 const path = require('path');
-const htmlToDocx = require('../dist/html-to-docx.umd.js'); // Import built UMD module
+const htmlToDocx = require('../dist/html-to-docx.umd.js');
 
-async function generateDocx() {
-    try {
-        const filePath = path.join(__dirname, 'sample.html');
-        const htmlString = fs.readFileSync(filePath, 'utf-8');
+const htmlString = fs.readFileSync(path.resolve(__dirname, 'sample.html'), 'utf-8');
 
-        const headerHtml = '<p>Header content</p>';
-        const footerHtml = '<p>Footer content</p>';
+(async () => {
+    const fileBuffer = await htmlToDocx(htmlString, null, {
+        table: { row: { cantSplit: true } },
+        footer: true,
+        pageNumber: true,
+        margins: { top: 1440, right: 1800, bottom: 1440, left: 1800 }, // Standard margins (1in V, 1.25in H)
+        pageSize: { width: 11906, height: 16838 }, // A4 size
+    });
 
-        const documentOptions = {
-            orientation: 'portrait',
-            margins: {
-                top: 720,
-            },
-            title: 'Test Document',
-        };
-
-        const buffer = await htmlToDocx(htmlString, headerHtml, documentOptions, footerHtml);
-
-        const outputPath = path.join(__dirname, 'output.docx');
-        fs.writeFileSync(outputPath, buffer);
-
-        console.log(`Document created successfully at: ${outputPath}`);
-    } catch (error) {
-        console.error('Error generating document:', error);
-        process.exit(1);
-    }
-}
-
-generateDocx();
+    fs.writeFileSync(path.resolve(__dirname, 'output.docx'), fileBuffer);
+    console.log('Document created successfully at:', path.resolve(__dirname, 'output.docx'));
+})();
