@@ -3067,12 +3067,12 @@ const buildTableRow = async (
       const tableHeight = modifiedAttributes.height || docxDocumentInstance.pageSize.height;
       modifiedAttributes.tableRowHeight = fixupRowHeight(
         (vNode.properties.style && vNode.properties.style.height) ||
-          (vNode.children[0] &&
+        (vNode.children[0] &&
           isVNode(vNode.children[0]) &&
           vNode.children[0].properties.style &&
           vNode.children[0].properties.style.height
-            ? vNode.children[0].properties.style.height
-            : undefined),
+          ? vNode.children[0].properties.style.height
+          : undefined),
         tableHeight
       );
     }
@@ -3199,6 +3199,7 @@ const buildTableGrid = (vNode, attributes) => {
     const gridColumns = vNode.children.filter((childVNode) => childVNode.tagName === 'col');
     const gridWidth = attributes.maximumWidth / gridColumns.length;
 
+
     for (let index = 0; index < gridColumns.length; index++) {
       const tableGridColFragment = buildTableGridCol(gridWidth);
       tableGridFragment.import(tableGridColFragment);
@@ -3212,19 +3213,79 @@ const buildTableGrid = (vNode, attributes) => {
 const buildTableGridFromTableRow = (vNode, attributes) => {
   const tableGridFragment = fragment({ namespaceAlias: { w: namespaces.w } }).ele('@w', 'tblGrid');
   if (vNodeHasChildren(vNode)) {
-    const numberOfGridColumns = vNode.children.reduce((accumulator, childVNode) => {
+    let totalExplicitPropertiesWidth = 0;
+
+    // First pass: calculate total explicit width and count grid columns
+    vNode.children.forEach((childVNode) => {
+
+
+      let cellWidth =
+        (childVNode.properties.attributes && childVNode.properties.attributes.width) ||
+        childVNode.properties.width;
+      if (!cellWidth && childVNode.properties && childVNode.properties.style) {
+        cellWidth = childVNode.properties.style.width;
+      }
+
+      if (cellWidth) {
+        // Assume explicit width covers all spanned columns (if any)
+        totalExplicitPropertiesWidth += fixupColumnWidth(cellWidth, attributes.maximumWidth);
+      }
+    });
+
+    const remainingWidth = Math.max(0, attributes.maximumWidth - totalExplicitPropertiesWidth);
+
+    // Count columns that don't have explicit width to distribute remaining width
+    let unspecifiedGridColumnsCount = 0;
+    vNode.children.forEach((childVNode) => {
+      let cellWidth =
+        (childVNode.properties.attributes && childVNode.properties.attributes.width) ||
+        childVNode.properties.width;
+      if (!cellWidth && childVNode.properties && childVNode.properties.style) {
+        cellWidth = childVNode.properties.style.width;
+      }
+
       const colSpan =
         childVNode.properties.colSpan ||
         (childVNode.properties.style && childVNode.properties.style['column-span']);
+      const effectiveColSpan = colSpan ? parseInt(colSpan) : 1;
 
-      return accumulator + (colSpan ? parseInt(colSpan) : 1);
-    }, 0);
-    const gridWidth = attributes.maximumWidth / numberOfGridColumns;
+      if (!cellWidth) {
+        unspecifiedGridColumnsCount += effectiveColSpan;
+      }
+    });
 
-    for (let index = 0; index < numberOfGridColumns; index++) {
-      const tableGridColFragment = buildTableGridCol(gridWidth);
-      tableGridFragment.import(tableGridColFragment);
-    }
+    const defaultGridWidth = unspecifiedGridColumnsCount > 0
+      ? remainingWidth / unspecifiedGridColumnsCount
+      : 0;
+
+    // Second pass: build grid columns
+    vNode.children.forEach((childVNode) => {
+      const colSpan =
+        childVNode.properties.colSpan ||
+        (childVNode.properties.style && childVNode.properties.style['column-span']);
+      const effectiveColSpan = colSpan ? parseInt(colSpan) : 1;
+
+      let cellWidth =
+        (childVNode.properties.attributes && childVNode.properties.attributes.width) ||
+        childVNode.properties.width;
+      if (!cellWidth && childVNode.properties && childVNode.properties.style) {
+        cellWidth = childVNode.properties.style.width;
+      }
+
+      let gridColWidth;
+      if (cellWidth) {
+        const totalCellWidth = fixupColumnWidth(cellWidth, attributes.maximumWidth);
+        // Distribute explicit width evenly across spanned columns
+        gridColWidth = totalCellWidth / effectiveColSpan;
+      } else {
+        gridColWidth = defaultGridWidth;
+      }
+
+      for (let index = 0; index < effectiveColSpan; index++) {
+        const tableGridColFragment = buildTableGridCol(gridColWidth);
+        tableGridFragment.import(tableGridColFragment);
+      }
+    });
   }
   tableGridFragment.up();
 
