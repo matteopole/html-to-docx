@@ -2797,6 +2797,16 @@ const buildTableCell = async (
         if (vNodeHasChildren(childVNode)) {
           await buildList(childVNode, docxDocumentInstance, tableCellFragment);
         }
+      } else if (isVNode(childVNode) && childVNode.tagName === 'table') {
+        const tableFragment = await buildTable(
+          childVNode,
+          {
+            maximumWidth: modifiedAttributes.maximumWidth,
+            rowCantSplit: docxDocumentInstance.tableRowCantSplit,
+          },
+          docxDocumentInstance
+        );
+        tableCellFragment.import(tableFragment);
       } else {
         const paragraphFragment = await buildParagraph(
           childVNode,
