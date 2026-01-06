@@ -529,7 +529,6 @@ const modifiedStyleAttributesBuilder = (docxDocumentInstance, vNode, attributes,
   if (isVNode(vNode) && vNode.properties && vNode.properties.style) {
     const vNodeStyle = vNode.properties.style;
     const vNodeStyleKeys = Object.keys(vNodeStyle);
-
     for (const vNodeStyleKey of vNodeStyleKeys) {
       const vNodeStyleValue = vNodeStyle[vNodeStyleKey];
       if (vNodeStyleKey === 'color') {
@@ -675,6 +674,26 @@ const modifiedStyleAttributesBuilder = (docxDocumentInstance, vNode, attributes,
       } else if (vNodeStyleKey === 'text-shadow') {
         if (vNodeStyleValue.trim() !== '' && vNodeStyleValue !== 'none') {
           modifiedAttributes.textShadow = vNodeStyleValue;
+        }
+      } else if (
+        ['border', 'border-top', 'border-right', 'border-bottom', 'border-left'].includes(
+          vNodeStyleKey
+        )
+      ) {
+        const [size, stroke, color] = cssBorderParser(vNodeStyleValue);
+        const borderSide = vNodeStyleKey === 'border' ? 'all' : vNodeStyleKey.split('-')[1];
+
+        if (!modifiedAttributes.borders) {
+          modifiedAttributes.borders = {};
+        }
+
+        if (borderSide === 'all') {
+          modifiedAttributes.borders.top = { size, spacing: 0, color, type: stroke };
+          modifiedAttributes.borders.right = { size, spacing: 0, color, type: stroke };
+          modifiedAttributes.borders.bottom = { size, spacing: 0, color, type: stroke };
+          modifiedAttributes.borders.left = { size, spacing: 0, color, type: stroke };
+        } else {
+          modifiedAttributes.borders[borderSide] = { size, spacing: 0, color, type: stroke };
         }
       }
     }
@@ -1224,18 +1243,17 @@ const buildHorizontalAlignment = (horizontalAlignment) => {
     .up();
 };
 
-const buildParagraphBorder = () => {
+const buildParagraphBorder = (borders) => {
   const paragraphBorderFragment = fragment({ namespaceAlias: { w: namespaces.w } }).ele(
     '@w',
     'pBdr'
   );
-  const bordersObject = cloneDeep(paragraphBordersObject);
 
-  Object.keys(bordersObject).forEach((borderName) => {
-    if (bordersObject[borderName]) {
-      const { size, spacing, color } = bordersObject[borderName];
+  Object.keys(borders).forEach((borderName) => {
+    if (borders[borderName]) {
+      const { size, spacing, color, type } = borders[borderName];
 
-      const borderFragment = buildBorder(borderName, size, spacing, color);
+      const borderFragment = buildBorder(borderName, size, spacing, color, type);
       paragraphBorderFragment.import(borderFragment);
     }
   });
@@ -1273,15 +1291,18 @@ const buildParagraphProperties = (attributes, docxDocumentInstance) => {
           // eslint-disable-next-line no-param-reassign
           delete attributes.textAlign;
           break;
-        case 'backgroundColor':
           // Add shading to Paragraph Properties only if display is block
           // Essentially if background color needs to be across the row
           if (attributes.display === 'block') {
             const shadingFragment = buildShading(attributes[key]);
             paragraphPropertiesFragment.import(shadingFragment);
             // FIXME: Inner padding in case of shaded paragraphs.
-            const paragraphBorderFragment = buildParagraphBorder();
-            paragraphPropertiesFragment.import(paragraphBorderFragment);
+            if (attributes.borders) {
+              // If borders are already defined, we don't need to add the default borders
+            } else {
+              const paragraphBorderFragment = buildParagraphBorder(paragraphBordersObject);
+              paragraphPropertiesFragment.import(paragraphBorderFragment);
+            }
             // eslint-disable-next-line no-param-reassign
             delete attributes.backgroundColor;
           }
@@ -1301,6 +1322,11 @@ const buildParagraphProperties = (attributes, docxDocumentInstance) => {
           const textDecorationFragment = buildTextDecoration(attributes[key]);
           paragraphPropertiesFragment.import(textDecorationFragment);
           // we don't delete attributes.textDecoration so that it could be inherited by children nodes.
+          break;
+        case 'borders':
+          const bordersFragment = buildParagraphBorder(attributes[key]);
+          paragraphPropertiesFragment.import(bordersFragment);
+          delete attributes.borders;
           break;
       }
     });

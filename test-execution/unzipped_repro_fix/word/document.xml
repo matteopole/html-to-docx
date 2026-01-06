@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:cdr="http://schemas.openxmlformats.org/drawingml/2006/chartDrawing" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:ve="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml">
+  <w:body>
+    <w:sectPr>
+      <w:pgSz w:w="12240" w:h="15840" w:orient="portrait"/>
+      <w:pgMar w:top="1440" w:right="1800" w:bottom="1440" w:left="1800" w:header="720" w:footer="720" w:gutter="0"/>
+      <w:footerReference r:id="rId6" w:type="default"/>
+    </w:sectPr>
+    <w:p>
+      <w:pPr>
+        <w:spacing w:lineRule="auto"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr/>
+        <w:t xml:space="preserve"/>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="Heading2"/>
+        <w:pBdr>
+          <w:bottom w:val="single" w:sz="24" w:space="0" w:color="4CAF50"/>
+        </w:pBdr>
+        <w:spacing w:lineRule="auto"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:color w:val="2a5298"/>
+          <w:sz w:val="30"/>
+        </w:rPr>
+        <w:t xml:space="preserve">Exercise 1: Ocean Zones Diagram</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pBdr>
+          <w:bottom w:val="single" w:sz="8" w:space="0" w:color="000000"/>
+        </w:pBdr>
+        <w:spacing w:line="330" w:after="225" w:lineRule="auto"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:rFonts w:ascii="Comic Sans MS" w:hAnsi="Comic Sans MS"/>
+        </w:rPr>
+        <w:t xml:space="preserve"> </w:t>
+      </w:r>
+    </w:p>
+  </w:body>
+</w:document>
