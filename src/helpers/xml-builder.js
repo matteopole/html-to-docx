@@ -2716,6 +2716,9 @@ const buildTableCell = async (
         rowIndexEquivalent,
         columnIndexEquivalent
       );
+      // We don't want to pass the border attributes to the children
+      // since the border is already applied to the cell
+      delete modifiedAttributes.borders;
     } else {
       // no style attribute was given to the table cell
 
